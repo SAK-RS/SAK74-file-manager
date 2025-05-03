@@ -1,11 +1,11 @@
 import { exec } from "node:child_process";
 import process, { argv, chdir, stdin, stdout } from "node:process";
 import cwdMessage from "./helpers/cwd-message.js";
-import { normalize } from "node:path";
-import { Readline, createInterface } from "node:readline/promises";
+import { createInterface } from "node:readline/promises";
 import colorized from "./utils/colorized.js";
-import { homedir, userInfo } from "node:os";
+import { homedir } from "node:os";
 import { InvalidInpurError, OperationFailedError } from "./helpers/errors.js";
+import { commands } from "./helpers/commands.js";
 
 await new Promise((res) => {
   exec("node -v", (_, output) => {
@@ -31,14 +31,9 @@ process.on("exit", () => {
   process.exit(0);
 });
 
-// const rl = new Readline(stdout);
-// rl.cursorTo(34);
-// rl.clearLine(0);
-
 const rl = createInterface({
   input: stdin,
   output: stdout,
-  // prompt: "prompt",
   signal: ac.signal,
 });
 
@@ -47,11 +42,25 @@ async function readLine() {
     const response = await rl.question(
       colorized("Type the operation: >", "blue")
     );
-    throw new InvalidInpurError();
+    if (response === ".exit") {
+      ac.abort();
+      process.exit(0);
+    }
 
+    const [cmd, ...args] = response.split(" ");
+
+    if (cmd in commands) {
+      try {
+        await commands[cmd](...args);
+      } catch (err) {
+        // console.log(err);
+        throw new OperationFailedError();
+      }
+    } else {
+      throw new InvalidInpurError();
+    }
     cwdMessage();
-    // do sth...
-    console.log({ response });
+
     readLine();
   } catch (err) {
     if (
@@ -59,6 +68,8 @@ async function readLine() {
       err instanceof OperationFailedError
     ) {
       console.log(err.message);
+      cwdMessage();
+
       readLine();
     }
   }
