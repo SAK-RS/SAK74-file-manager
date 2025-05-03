@@ -1,4 +1,3 @@
-import { exec } from "node:child_process";
 import process, { argv, chdir, stdin, stdout } from "node:process";
 import cwdMessage from "./helpers/cwd-message.js";
 import { createInterface } from "node:readline/promises";
@@ -6,12 +5,9 @@ import colorized from "./utils/colorized.js";
 import { homedir } from "node:os";
 import { InvalidInpurError, OperationFailedError } from "./helpers/errors.js";
 import { commands } from "./helpers/commands.js";
+import getNodeV from "./utils/getNodeV.js";
 
-await new Promise((res) => {
-  exec("node -v", (_, output) => {
-    res(console.log(colorized("Node version: " + output, "green")));
-  });
-});
+console.log(colorized("Node version: " + (await getNodeV()), "green"));
 
 const userName = argv.slice(2)[1].slice(2);
 console.log(`Welcome to the File Manager, ${userName}!`);
