@@ -1,0 +1,13 @@
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "description": "training project",
+  "license": "ISC",
+  "author": "SAK74",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch src -- --SAK",
+    "start": "node src -- --SAK"
+  }
+}
