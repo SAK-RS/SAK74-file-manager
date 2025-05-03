@@ -25,7 +25,7 @@ process.on("exit", () => {
   console.log(
     colorized(
       `\nThank you for using File Manager, ${userName}, goodbye!`,
-      "red"
+      "magenta"
     )
   );
   process.exit(0);
@@ -47,13 +47,15 @@ async function readLine() {
       process.exit(0);
     }
 
-    const [cmd, ...args] = response.split(" ");
+    const [cmd, ...args] = response.trim().split(" ");
 
     if (cmd in commands) {
       try {
-        await commands[cmd](...args);
+        await commands[cmd](...args.filter(Boolean));
       } catch (err) {
-        // console.log(err);
+        if (err instanceof InvalidInpurError) {
+          throw err;
+        }
         throw new OperationFailedError();
       }
     } else {
@@ -67,9 +69,8 @@ async function readLine() {
       err instanceof InvalidInpurError ||
       err instanceof OperationFailedError
     ) {
-      console.log(err.message);
+      console.log(colorized(err.message, "red"));
       cwdMessage();
-
       readLine();
     }
   }
