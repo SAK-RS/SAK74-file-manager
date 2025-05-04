@@ -8,6 +8,9 @@ export function up() {
 }
 
 export function cd(path_to_dir) {
+  if (!path_to_dir) {
+    throw new InvalidInpurError();
+  }
   chdir(normalize(path_to_dir));
 }
 
