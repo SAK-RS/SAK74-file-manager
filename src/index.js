@@ -44,7 +44,6 @@ async function readLine() {
     }
 
     const [cmd, ...args] = response.trim().split(" ");
-
     if (cmd in commands) {
       try {
         await commands[cmd](...args.filter(Boolean));

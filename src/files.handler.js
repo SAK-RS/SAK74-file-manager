@@ -71,6 +71,7 @@ export async function cp(path_to_file, path_to_new_dir) {
   const path = resolve(cwd(), normalize(path_to_file));
 
   await validatePath(path);
+  await validatePath(resolve(path_to_new_dir));
 
   return new Promise(async (res, rej) => {
     try {
@@ -84,9 +85,8 @@ export async function cp(path_to_file, path_to_new_dir) {
       writeStream.on("finish", () => {
         res();
       });
-      writeStream.on("error", () => {
-        rej();
-      });
+      writeStream.on("error", rej);
+      readStream.on("error", rej);
 
       readStream.pipe(writeStream);
     } catch {
@@ -114,6 +114,8 @@ export async function rm(path_to_file) {
 
 async function validatePath(path) {
   if (!(await isExist(path))) {
+    console.log("No-existing resource!");
+
     throw new InvalidInpurError();
   }
 }
